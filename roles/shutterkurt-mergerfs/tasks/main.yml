@@ -11,5 +11,7 @@
     fstype: '{{ item.fs }}'
     # change to 'mounted' to auto mount
     state: mounted
+  loop_control:
+    label: '{{ item.mountpoint }}'
   with_items:
     - '{{ mergerfs_fstab_info }}'
