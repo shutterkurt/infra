@@ -1,0 +1,40 @@
+---
+- name: update apt cache
+  apt:
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Ensure Samba-related packages are installed
+  apt:
+    name:
+      - samba
+      - samba-common
+    state: present
+
+- name: Ensure Samba is running and starts on boot
+  service:
+    name: smbd
+    state: started
+    enabled: true
+
+- name: install samba config
+  ansible.builtin.template:
+    src: smb.conf.j2
+    dest: /etc/samba/smb.conf
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
+    backup: yes
+  notify:
+    - restart samba service
+
+- name: Configure Samba users.
+  shell: >
+    (pdbedit --user={{ item.username }} 2>&1 > /dev/null)
+    || (echo '{{ item.password }}'; echo '{{ item.password }}')
+    | smbpasswd -s -a {{ item.username }}
+  register: smbpasswd
+  changed_when: "'Added user' in smbpasswd.stdout"
+  with_items: '{{ filesharing_samba_users }}'
+  loop_control:
+    label: '{{ item.username }}'

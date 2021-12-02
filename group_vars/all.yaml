@@ -1,0 +1,43 @@
+---
+# global settings
+main_username: kurt
+main_groupname: '{{ main_username }}'
+main_email: '{{ secrets_main_email }}'
+main_emailpw: '{{ secrets_main_emailpw }}'
+main_sambapw: '{{ secrets_main_sambapw }}'
+main_uid: '1000'
+main_gid: '{{ main_uid }}'
+disckey: '{{ secrets_disckey }}'
+
+# grog.package
+# common package list - override in group/host vars
+# should I do it this way? i.e. it will just merge + uniqify
+package_list:
+  - name: build-essential
+  - name: curl
+  - name: git
+  - name: htop
+  - name: net-tools
+  - name: openssh-server
+  - name: python3
+  - name: rsync
+  - name: sudo
+  - name: tmux
+  - name: tree
+  - name: wget
+
+# geerlingguy.ntp
+ntp_timezone: 'America/New_York'
+# ntp_area:'North America'  to limit pool to use closer servers?
+# ntp_manage_config: true
+
+# geerlingguy.security
+security_ssh_port: 22
+security_ssh_password_authentication: 'no'
+security_ssh_permit_root_login: 'no'
+security_ssh_usedns: 'no'
+security_autoupdate_enabled: true
+security_fail2ban_enabled: true
+security_sudoers_passwordless:
+  - '{{main_username}}'
+# docker compose stuff

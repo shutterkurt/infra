@@ -1,0 +1,44 @@
+# see https://www.samba.org/samba/docs/current/man-html/smb.conf.5.html
+
+[global]
+  workgroup = {{ filesharing_workgroup | default("WORKGROUP") }}
+  # equiv to NT Description field
+  server string = {{ filesharing_server_string }}   
+# allow only these subnets to connect
+  hosts allow = 192.168.1.
+# explicitly set server role and security
+  server role = standalone
+  security = user
+# allow guest (everyone) access - also enabled/disabled on individual shares
+  guest ok = yes
+# using Bad Password here will silently change user to guest - which one to use?
+#  map to guest = Bad Password
+  map to guest = Bad User
+# separate log file for each machine - %m inserts client netbios name
+  log file = /var/log/samba/%m.log
+# cap log at this size in Kb
+  max log size = 50
+  printcap name = /dev/null
+  load printers = no
+
+{% if filesharing_enable_homes %}
+# Home shares
+[homes]
+   comment = Home Directories
+   browseable = no
+   read only = no
+   guest ok = no
+
+{% endif %}
+
+# Samba Shares
+{% for share in filesharing_shares %}
+[{{ share.name }}]
+  comment = {{ share.comment }}
+  path = {{ share.path }}
+  browseable = {{ share.browseable | default("yes") }}
+  read only = {{ share.read_only | default("no") }}
+  guest ok = {{ share.guest_ok | default("no") }}
+
+{% endfor %}
+

@@ -1,0 +1,15 @@
+---
+- name: install mergerfs
+  include: install.yml
+  when: mergerfs_install
+
+- name: mount mergerfs array
+  mount:
+    path: '{{ item.mountpoint }}'
+    src: '{{ item.source }}'
+    opts: '{{ item.opts }}'
+    fstype: '{{ item.fs }}'
+    # change to 'mounted' to auto mount
+    state: mounted
+  with_items:
+    - '{{ mergerfs_fstab_info }}'

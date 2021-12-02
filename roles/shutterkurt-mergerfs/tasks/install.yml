@@ -1,0 +1,65 @@
+---
+# basically follows https://github.com/sprat/ansible-role-mergerfs/blob/master/tasks/install_from_github_releases.yml
+
+- name: on Local get latest release info
+  become: false
+  delegate_to: localhost
+  run_once: true
+  block:
+    - name: query github for latest release
+      uri:
+        url: '{{mergerfs_github_releases_url}}/latest'
+      register: mergerfs_github_latest_page
+    - name: extract version and set fact
+      set_fact:
+        mergerfs_version: "{{ mergerfs_github_latest_page['url'].split('/')[-1] }}"
+  when: mergerfs_version == "latest"
+
+- name: determine package download url
+  set_fact:
+    mergerfs_package_url: '{{ mergerfs_github_releases_url }}download/{{ mergerfs_version }}/{{ mergerfs_pkg_prefix }}{{ mergerfs_version }}{{ mergerfs_pkg_suffix }}'
+
+- name: debug print calculated mergerfs download url
+  ansible.builtin.debug:
+    msg: 'calculated mergerfs download url = {{ mergerfs_package_url }}'
+
+- name: update apt cache
+  apt:
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: install xz-utils package for .deb package installs via 'apt' module
+  apt:
+    name: xz-utils
+    state: present
+
+- name: install mergerfs deb package from url
+  apt:
+    deb: '{{ mergerfs_package_url }}'
+    state: present
+    only_upgrade: true
+
+- name: remove temp dir - prereq for git clone (next step)
+  ansible.builtin.file:
+    path: '{{ mergerfs_tools_dir }}'
+    state: absent
+  when: mergerfs_tools_install
+
+- name: download mergerfs-tools from github if enabled
+  ansible.builtin.git:
+    repo: '{{ mergerfs_tools_repo }}'
+    dest: '{{ mergerfs_tools_dir }}'
+  when: mergerfs_tools_install
+
+- name: install mergerfs-tools
+  community.general.make:
+    chdir: '{{ mergerfs_tools_dir }}'
+    target: install
+  become: true
+  when: mergerfs_tools_install
+
+- name: cleanup - remove temp dir after install
+  ansible.builtin.file:
+    path: '{{ mergerfs_tools_dir }}'
+    state: absent
+  when: mergerfs_tools_install

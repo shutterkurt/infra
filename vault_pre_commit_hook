@@ -1,0 +1,14 @@
+#!/bin/sh
+vault_file=vars/vault.yaml
+git ls-files --error-unmatch $vault_file > /dev/null 2>&1
+# if vault file inside repo, see if its encrypted - header will start with ANSIBLE_VAULT
+if [ $? -eq 0 ]; then
+    if ( git show :$vault_file | grep -q "\$ANSIBLE_VAULT;" ); then
+        echo "[38;5;108mVault Encrypted. Safe to commit.[0m"
+    else
+        echo "[38;5;208mVault not encrypted! Run 'make encrypt' and try again.[0m"
+        exit 1
+    fi
+else
+    echo "vault not in repo"
+fi

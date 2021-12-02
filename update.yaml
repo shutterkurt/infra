@@ -1,0 +1,15 @@
+---
+
+- hosts: servers
+  tasks:
+    # - name: import keys from github  # FIXME: update for my keys
+    #   authorized_key:  
+    #     user: "{{ ansible_user | default('yourname') }}"
+    #     state: present
+    #     key: https://github.com/ironicbadger.keys
+    - name: update all packages
+      become: true
+      package:
+        name: '*'
+        state: latest
+  

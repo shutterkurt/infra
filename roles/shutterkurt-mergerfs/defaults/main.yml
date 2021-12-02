@@ -1,0 +1,13 @@
+---
+# install mergerfs from github repo
+mergerfs_install: true
+# install or not the extra python tools with mergerfs
+mergerfs_tools_install: false
+# version number to install - or latest to determine the latest automatically
+mergerfs_version: latest
+# github repo to use for mergerfs
+mergerfs_github_releases_url: 'https://github.com/trapexit/mergerfs/releases/'
+# github repo to use for mergerfs-tools
+mergerfs_tools_repo: https://github.com/trapexit/mergerfs-tools.git
+# git clone mergerfs-tools into this directory
+mergerfs_tools_dir: /tmp/mergerfs_tools

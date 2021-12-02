@@ -1,0 +1,15 @@
+---
+- name: disks
+  include: disks.yml
+  tags:
+    - disks
+# - name: file-sharing
+#   include: file-sharing.yml
+#   tags:
+#     - file-sharing
+#
+#  FIXME: copy over the zfs override for docker
+# https://serverfault.com/questions/904421/docker-service-starts-before-zfs
+# i.e. force docker not to start unless zfs is started
+# fixes possible race condition between zfs mounting drives
+# and docker trying to use them

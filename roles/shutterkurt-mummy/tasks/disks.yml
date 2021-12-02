@@ -1,0 +1,48 @@
+---
+# FIXME: move disk setup into separate role!
+- name: setup luks mapping
+  community.general.crypttab:
+    backing_device: '{{ item.device }}'
+    name: '{{ item.name }}'
+    opts: '{{ item.cryptopts }}'
+    password: '{{ disckey }}'
+    state: present
+  with_items:
+    - '{{ snapraid_data_disks }}'
+    # - '{{ snapraid_parity_disks }}'
+  no_log: true
+
+# should luks containers be closed, then reopened? only if crypttab changed??
+- name: re-read crypttab file to open disks
+  command: cryptdisks_start {{ item.name }}
+  become: true
+  with_items:
+    - '{{ snapraid_data_disks }}'
+    # - '{{ snapraid_parity_disks }}'
+
+- name: create /mnt points
+  file:
+    dest: '{{ item.path }}'
+    state: directory
+    owner: nobody
+    group: nogroup
+    mode: 0777
+  with_items:
+    - '{{ snapraid_parity_disks }}'
+    - '{{ snapraid_data_disks }}'
+    - '{{ extra_mountpoints }}'
+
+- name: mount disks
+  ansible.posix.mount:
+    path: '{{ item.path }}'
+    src: '/dev/mapper/{{ item.name }}'
+    fstype: '{{ item.fs }}'
+    opts: '{{ item.fsopts }}'
+    # change to 'mounted' to auto mount
+    # present will only change fstab but not mount
+    state: mounted
+  with_items:
+    # - '{{ snapraid_parity_disks }}'    #FIXME: add back parity disk
+    - '{{ snapraid_data_disks }}'
+    - '{{ extra_mountpoints }}'
+  when: item.path != '/mnt/storage'
