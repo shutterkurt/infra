@@ -18,3 +18,4 @@
     - role: grog.package
     - role: shutterkurt-mummy
     - role: shutterkurt-mergerfs
+    - role: shutterkurt-filesharing

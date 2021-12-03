@@ -1,5 +1,5 @@
 # see https://www.samba.org/samba/docs/current/man-html/smb.conf.5.html
-
+# basically taken from the default ubuntu 20.04 smb.conf file - removing comments
 [global]
   workgroup = {{ filesharing_workgroup | default("WORKGROUP") }}
   # equiv to NT Description field
@@ -7,7 +7,7 @@
 # allow only these subnets to connect
   hosts allow = 192.168.1.
 # explicitly set server role and security
-  server role = standalone
+  server role = standalone server
   security = user
 # allow guest (everyone) access - also enabled/disabled on individual shares
   guest ok = yes
@@ -15,20 +15,35 @@
 #  map to guest = Bad Password
   map to guest = Bad User
 # separate log file for each machine - %m inserts client netbios name
-  log file = /var/log/samba/%m.log
+  log file = /var/log/samba/log.%m
 # cap log at this size in Kb
-  max log size = 50
+  max log size = 1000
+  logging = file
   printcap name = /dev/null
   load printers = no
 
+# bitwise AND mask to the unix permissions
+# default of 0744 - to remove write permission from group and other
+# how about only force removal rwx from other
+# THINK: 0660 to also remove execute from shares???
+  create mask = 0770
+  directory mask = 0770
+
+
 {% if filesharing_enable_homes %}
-# Home shares
+# Home shares - TODO: untested
 [homes]
    comment = Home Directories
    browseable = no
    read only = no
    guest ok = no
-
+   # bitwise AND mask like above
+   # in this case remove write permission from group and rwx from other
+   # the inverse of umask 027
+   create mask = 0750
+   directory mask = 0750
+   # keep only the logged in user to his/her own home dir
+   valid users = %S
 {% endif %}
 
 # Samba Shares

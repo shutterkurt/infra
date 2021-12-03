@@ -2,5 +2,5 @@
 filesharing_shares: []
 filesharing_samba_users: []
 filesharing_workgroup: WORKGROUP
-filesharing_server_string: 'Samba Server %h'
+filesharing_server_string: '%h server (Samba, Ubuntu)'
 filesharing_enable_homes: false

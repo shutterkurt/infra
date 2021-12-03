@@ -28,13 +28,35 @@
   notify:
     - restart samba service
 
-- name: Configure Samba users.
-  shell: >
-    (pdbedit --user={{ item.username }} 2>&1 > /dev/null)
-    || (echo '{{ item.password }}'; echo '{{ item.password }}')
-    | smbpasswd -s -a {{ item.username }}
-  register: smbpasswd
-  changed_when: "'Added user' in smbpasswd.stdout"
+# use the group sticky bit on shares to make the dir/files accessable by
+# other users in the 'users' group - but not others
+- name: ensure shares (top level directories) have valid permissions
+  ansible.builtin.file:
+    path: '{{ item.path }}'
+    owner: nobody
+    group: users
+    mode: 02770
+  with_items: '{{ filesharing_shares }}'
+
+- name: ensure that the samba users are in the users group
+  ansible.builtin.user:
+    name: '{{ item.name }}'
+    groups: users
+    append: yes
   with_items: '{{ filesharing_samba_users }}'
   loop_control:
-    label: '{{ item.username }}'
+    label: '{{ item.name }}'
+  no_log: true # so password isn't logged!
+
+# set user password within samba to access user share
+# - name: Configure Samba users.
+#   shell: >
+#     (pdbedit --user={{ item.username }} 2>&1 > /dev/null)
+#     || (echo '{{ item.password }}'; echo '{{ item.password }}')
+#     | smbpasswd -s -a {{ item.username }}
+#   register: smbpasswd
+#   changed_when: "'Added user' in smbpasswd.stdout"
+#   with_items: '{{ filesharing_samba_users }}'
+#   loop_control:
+#     label: '{{ item.username }}'
+#   when: "{{ filesharing_enable_homes }}"
