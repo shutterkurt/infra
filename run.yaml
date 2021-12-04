@@ -20,3 +20,4 @@
     - role: shutterkurt-mergerfs
     - role: shutterkurt-filesharing
     - role: shutterkurt-zsh
+    - role: geerlingguy.security

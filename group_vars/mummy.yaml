@@ -116,3 +116,6 @@ zsh_user_configs:
     antigen_bundles:
       - git
       - zsh-users/zsh-syntax-highlighting
+
+security_sudoers_passwordless:
+  - '{{ main_username }}'

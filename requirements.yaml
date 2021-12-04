@@ -18,12 +18,10 @@
 # probably ok for right now
 
 # installs docker, docker compose on target; adds system users to docker group
-# - src: geerlingguy.docker
-
-# perhaps add the geerlingguy.pip role
+- src: geerlingguy.docker
 # installs pip3 (python3-pip), and list of pip packages to install
 # can install into virtualenv as well
-
+- src: geerlingguy.pip
 # take a github username and create system account with same
 # then add all the public keys associated with the github account to the
 # user's 'authorized_keys'
@@ -33,18 +31,9 @@
 # installs and configures hddtemp for debian
 # - src: ironicbadger.ansible_role_hddtemp
 
-# not sure I'll use - look for zsh, oh-my-zsh, etc
-# https://github.com/gantsign/ansible-role-oh-my-zsh
-#or https://galaxy.ansible.com/gantsign/antigen
-# - src: ironicbadger.ansible_role_bash_aliases
-
 # builds from docker, installs, configures snapraid
 # and either installs cron job or snapraidrunner for periodic scrubs
 # - src: ironicbadger.ansible_role_snapraid
-
-# role to manage users on a system - there must be a built in role for this!
-# not sure I even need - other than copying ssh keys?
-# - src: ironicbadger.ansible_users
 
 # install, configure, manage telegraf
 # - src: rossmcdonald.telegraf
