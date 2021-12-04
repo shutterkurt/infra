@@ -108,3 +108,9 @@ filesharing_shares:
 
 filesharing_samba_users:
   - { name: '{{ main_username }}', password: '{{ secrets_main_sambapw }}' }
+
+# assumes install of oh-my-zsh and powerlevel10K prompt
+zsh_user_configs:
+  - username: '{{ main_username }}'
+    antigen_bundles:
+      - git

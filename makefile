@@ -4,6 +4,9 @@ ping:
 mummy:
 	ansible-playbook -b run.yaml --limit mummy --ask-become-pass 
 
+testmummy:
+	ansible-playbook -b run.yaml --limit mummy --tags testing --ask-become-pass 
+
 reqs:
 	ansible-galaxy install -r requirements.yaml
 

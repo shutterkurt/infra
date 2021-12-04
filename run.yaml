@@ -19,3 +19,4 @@
     - role: shutterkurt-mummy
     - role: shutterkurt-mergerfs
     - role: shutterkurt-filesharing
+    - role: shutterkurt-zsh

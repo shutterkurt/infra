@@ -1,0 +1,72 @@
+---
+- name: Ensure zsh is installed
+  apt:
+    name:
+      - zsh
+    state: present
+    cache_valid_time: 3600
+
+- name: Get path of zsh
+  ansible.builtin.command: which zsh
+  changed_when: false
+  register: which_zsh
+
+- name: Set zsh as shell for zsh_users
+  ansible.builtin.user:
+    name: '{{ item.username }}'
+    shell: '{{ which_zsh.stdout }}'
+  with_items: '{{ zsh_user_configs }}'
+  loop_control:
+    label: '{{ item.username }}'
+
+- name: Ensure zsh-antigen is NOT installed (had issues in the past)
+  apt:
+    name:
+      - zsh-antigen
+    state: absent
+
+- name: Make sure install directory exists
+  ansible.builtin.file:
+    path: '~{{ item.username }}/.antigen'
+    owner: '{{ item.username }}'
+    mode: 'u=rwx,go=rx'
+    state: directory
+  with_items: '{{ zsh_user_configs }}'
+  loop_control:
+    label: '{{ item.username }}'
+
+- name: Clone the antigen repo
+  ansible.builtin.git:
+    repo: https://github.com/zsh-users/antigen.git
+    dest: '~{{ item.username }}/.antigen'
+    clone: yes
+    update: yes
+  become: yes
+  become_user: '{{ item.username }}'
+  with_items: '{{ zsh_user_configs }}'
+  loop_control:
+    label: '{{ item.username }}'
+
+- name: Create example .zshrc file - user must copy it over
+  ansible.builtin.template:
+    src: zshrc.zsh.j2
+    dest: '~{{ item.username }}/.zshrc.example'
+    owner: '{{ item.username }}'
+    backup: yes
+  become: yes
+  become_user: '{{ item.username }}'
+  vars:
+    bundles: '{{ item.antigen_bundles }}'
+  with_items: '{{ zsh_user_configs }}'
+  loop_control:
+    label: '{{ item.username }}'
+
+- name: Copy over sample powerlevel10k theme prompt
+  ansible.builtin.copy:
+    src: .p10k.zsh
+    dest: '~{{ item.username }}/.p10k.zsh'
+    owner: '{{ item.username }}'
+    backup: yes
+  with_items: '{{ zsh_user_configs }}'
+  loop_control:
+    label: '{{ item.username }}'

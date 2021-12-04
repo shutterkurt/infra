@@ -37,6 +37,8 @@
     group: users
     mode: 02770
   with_items: '{{ filesharing_shares }}'
+  loop_control:
+    label: '{{ item.path }}'
 
 - name: ensure that the samba users are in the users group
   ansible.builtin.user:
