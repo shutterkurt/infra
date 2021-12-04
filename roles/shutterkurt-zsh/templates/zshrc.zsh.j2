@@ -101,8 +101,10 @@ setopt histignorealldups
 # Turn off all beeps
 # unsetopt BEEP
 # Turn off autocomplete beeps
-
 unsetopt LIST_BEEP
+
+# set umask so that group can only read my files but o can't do any
+umask 027
 
 # Preferred editor for local and remote sessions
 # if on ssh use code otherwise use vim
