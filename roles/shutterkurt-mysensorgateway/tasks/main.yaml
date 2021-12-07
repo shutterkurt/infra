@@ -1,0 +1,64 @@
+---
+- name: make sure dependencies are installed
+  apt:
+    name:
+      - build-essential
+      - git
+      - make
+    state: present
+    cache_valid_time: 3600
+
+- name: Make sure install directory exists
+  ansible.builtin.file:
+    path: '{{ msgw_dir }}'
+    owner: '{{ msgw_username }}'
+    mode: 'u=rwx,go=rx'
+    state: directory
+
+- name: Clone/Update the MySensors repo
+  ansible.builtin.git:
+    repo: '{{ msgw_repo_url }}'
+    dest: '{{ msgw_dir }}'
+    clone: yes
+    update: yes
+    version: '{{ msgw_repo_version }}'
+  become: yes
+  become_user: '{{ msgw_username }}'
+  register: clone_response
+
+- name: Force to reconfigure (remove Makefile.inc, the configure output file)
+  ansible.builtin.file:
+    path: '{{ msgw_dir }}/Makefile.inc'
+    state: absent
+  when: (msgw_rerun_configure | bool) or (clone_response.remote_url_changed)
+
+- name: Configure the MySensors for compilation
+  ansible.builtin.shell: './configure {{ msgw_configure_parameters }}'
+  args:
+    chdir: '{{ msgw_dir }}'
+    creates: Makefile.inc
+  become: yes
+  become_user: '{{ msgw_username }}'
+# any other configuration options? port?
+
+- name: Compile MySensors Gateway
+  community.general.make:
+    chdir: '{{ msgw_dir }}'
+    target: all
+  become: true
+  become_user: '{{ msgw_username }}'
+# copy over a sensable config file
+
+#   notify: restart msgw
+# - name: Install MySensors Gateway
+#   community.general.make:
+#     chdir: '{{ msgw_dir }}'
+#     target: install
+#   become: true
+#   notify: restart msgw
+# - name: Ensure MySensors Gateway service is enabled/started
+#   service:
+#     name: msgw
+#     state: started
+#     enabled: true
+

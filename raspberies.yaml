@@ -1,0 +1,15 @@
+---
+# playbook for raspberry pis
+# perhaps move to main 'run' playbook
+
+- hosts: applepi
+  vars_files:
+    - 'vars/vault.yaml'
+  roles:
+    - role: grog.package
+    - role: geerlingguy.security
+    - role: shutterkurt-zsh
+    - role: shutterkurt-mysensorgateway
+      tags: testing
+    - role: shutterkurt-bat
+      tags: install_bat

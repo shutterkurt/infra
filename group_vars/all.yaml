@@ -18,7 +18,6 @@ package_list:
   - name: git
   - name: htop
   - name: net-tools
-  - name: openssh-server
   - name: python3
   - name: rsync
   - name: sudo

@@ -1,0 +1,26 @@
+---
+myhostname: applepi
+
+# override global settings
+main_username: pi
+
+# grog.package - extra packages for this group/server
+package_list_group:
+  - name: htop
+
+# assumes install of oh-my-zsh and powerlevel10K prompt
+# zsh-syntax-highlighting needs to be last! (must be last to hook into cmd line)
+# check to see if things are too slow on this old pi
+zsh_user_configs:
+  - username: '{{ main_username }}'
+    antigen_bundles:
+      - git
+      - zsh-users/zsh-syntax-highlighting
+
+security_sudoers_passwordless:
+  - '{{ main_username }}'
+
+# role: shutterkurt-msgw
+msgw_username: '{{ main_username }}'
+msgw_configure_parameters: '--soc=BCM2835 --my-transport=rf24 --my-rf24-ce-pin=29 --my-debug=enable --my-rf24-cs-pin=26'
+msgw_rerun_configure: false

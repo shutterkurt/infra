@@ -1,11 +1,20 @@
 ping:
 	ansible all -m ping
 
-mummy:
-	ansible-playbook -b run.yaml --limit mummy --ask-become-pass 
+applepi:
+	ansible-playbook -b raspberies.yaml --limit applepi --tags install_bat --ask-become-pass 
 
-testmummy:
-	ansible-playbook -b run.yaml --limit mummy --tags testing --ask-become-pass 
+dump-applepi:
+	ansible-playbook -b dump.yaml --limit applepi --ask-become-pass 
+
+update-applepi:
+	ansible-playbook -b update.yaml --limit applepi --ask-become-pass 
+
+mummy:
+	ansible-playbook -b run.yaml --skip-tags drivesetup --limit mummy --ask-become-pass 
+
+drivemummy:
+	ansible-playbook -b run.yaml --limit mummy --tags drivesetup --ask-become-pass 
 
 reqs:
 	ansible-galaxy install -r requirements.yaml

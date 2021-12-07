@@ -1,0 +1,13 @@
+---
+# the My Sensors Git Repository
+msgw_repo_url: https://github.com/mysensors/MySensors
+# the version to download - this can be either a branch or a tag
+# msgw_repo_version: '2.3.2'  has compile error(s) for raspberry pi!!!!
+msgw_repo_version: development
+# working directory to clone the repo and configure/build in
+msgw_dir: /tmp/msgw_install
+# forces configure to rerun by deleting the configure output (Makefile.inc)
+msgw_rerun_configure: true
+# the configure parameters - most likely need to give something
+# run configure -h in working directory after clone to see options
+msgw_configure_parameters: ''
