@@ -1,0 +1,35 @@
+- name: on Local get latest release info
+  become: false
+  delegate_to: localhost
+  run_once: true
+  block:
+    - name: query github for latest release
+      uri:
+        url: '{{bat_github_releases_url}}/latest'
+      register: bat_github_latest_page
+    - name: extract version and set fact
+      set_fact:
+        bat_version: "{{ bat_github_latest_page['url'].split('/')[-1] }}"
+  when: bat_version == "latest"
+
+- name: determine package download url
+  set_fact:
+    # bat_version is of the form 'v0.18.3' but the deb file name does not have the 'v', hence [1:]
+    bat_package_url: '{{ bat_github_releases_url }}download/{{ bat_version }}/{{ bat_pkg_prefix }}{{ bat_version[1:] }}{{ bat_pkg_suffix }}'
+
+- name: debug print calculated bat download url
+  ansible.builtin.debug:
+    msg: 'calculated bat download url = {{ bat_package_url }}'
+
+- name: install xz-utils package for .deb package installs via 'apt' module
+  apt:
+    name: xz-utils
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: install bat deb package from url
+  apt:
+    deb: '{{ bat_package_url }}'
+    state: present
+    only_upgrade: true

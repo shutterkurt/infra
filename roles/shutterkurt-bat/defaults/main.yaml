@@ -1,0 +1,8 @@
+---
+# install bat from github repo
+bat_install: true
+# version number to install - or latest to determine the latest automatically
+bat_version: latest
+# github repo to use for bat
+bat_github_repo: https://github.com/sharkdp/bat
+bat_github_releases_url: '{{ bat_github_repo }}/releases/'
