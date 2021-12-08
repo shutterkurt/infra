@@ -39,16 +39,15 @@
     state: present
     only_upgrade: true
 
-- name: remove temp dir - prereq for git clone (next step)
-  ansible.builtin.file:
-    path: '{{ mergerfs_tools_dir }}'
-    state: absent
-  when: mergerfs_tools_install
-
 - name: download mergerfs-tools from github if enabled
   ansible.builtin.git:
     repo: '{{ mergerfs_tools_repo }}'
     dest: '{{ mergerfs_tools_dir }}'
+    clone: yes
+    update: yes
+  register:
+    tools_response
+    #  version:  defaults to HEAD if not given
   when: mergerfs_tools_install
 
 - name: install mergerfs-tools
@@ -56,10 +55,4 @@
     chdir: '{{ mergerfs_tools_dir }}'
     target: install
   become: true
-  when: mergerfs_tools_install
-
-- name: cleanup - remove temp dir after install
-  ansible.builtin.file:
-    path: '{{ mergerfs_tools_dir }}'
-    state: absent
-  when: mergerfs_tools_install
+  when: mergerfs_tools_install and tools_response.changed

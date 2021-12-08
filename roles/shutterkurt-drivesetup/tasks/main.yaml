@@ -9,7 +9,7 @@
 
 - name: Confirm reformating of disks
   ansible.builtin.pause:
-    prompt: 'This will reformat the drives!, are you sure? Type YES to reformat'
+    prompt: 'This could reformat the drives!, are you sure? Type YES to reformat'
   register: confirm_reformat1
 
 - name: Fail when not confirmed
@@ -19,7 +19,7 @@
 
 - name: Last chance reformating of disks
   ansible.builtin.pause:
-    prompt: 'Last chance, drives will be formatted!'
+    prompt: 'Last chance, drives could be formatted!'
   register: confirm_reformat2
 
 - name: Fail when not confirmed

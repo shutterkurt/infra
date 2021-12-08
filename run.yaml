@@ -17,7 +17,7 @@
     - 'vars/vault.yaml'
   roles:
     - role: shutterkurt-drivesetup
-    # - role: shutterkurt-mergerfs
+    - role: shutterkurt-mergerfs
   tags:
     - drivesetup
 
