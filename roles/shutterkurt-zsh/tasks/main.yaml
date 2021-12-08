@@ -1,8 +1,9 @@
 ---
-- name: Ensure zsh is installed
+- name: Ensure zsh, git are installed
   apt:
     name:
       - zsh
+      - git
     state: present
     cache_valid_time: 3600
 
@@ -35,7 +36,7 @@
   loop_control:
     label: '{{ item.username }}'
 
-- name: Clone the antigen repo
+- name: Clone/Update the antigen repo
   ansible.builtin.git:
     repo: https://github.com/zsh-users/antigen.git
     dest: '~{{ item.username }}/.antigen'

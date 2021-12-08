@@ -11,13 +11,22 @@
         - 95-hwe-eol
         - 10-help-text
       when: ansible_distribution == 'Ubuntu'
+
+- hosts: mummy
+  vars_files:
+    - 'vars/vault.yaml'
+  roles:
+    - role: shutterkurt-drivesetup
+    # - role: shutterkurt-mergerfs
+  tags:
+    - drivesetup
+
 - hosts: mummy
   vars_files:
     - 'vars/vault.yaml'
   roles:
     - role: grog.package
-    - role: shutterkurt-mummy
-    - role: shutterkurt-mergerfs
     - role: shutterkurt-filesharing
     - role: shutterkurt-zsh
     - role: geerlingguy.security
+    - role: ironicbadger.ansible_role_hddtemp

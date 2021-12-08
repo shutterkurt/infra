@@ -28,6 +28,38 @@ snapraid_config_excludes:
   - '.Trashes'
   - '.AppleDB'
 
+# initial mapping:
+# /dev/disk/by-id/scsi-35000cca06d15906c -> ../../sdb
+# /dev/disk/by-id/scsi-35000cca06d159054 -> ../../sdc
+# /dev/disk/by-id/scsi-35000cca06d11fcb8 -> ../../sdd
+# /dev/disk/by-id/scsi-35000cca06d12ac50 -> ../../sde
+
+drivesetup_drives:
+  - device: /dev/disk/by-id/scsi-35000cca06d15906c
+    name: dat1
+    path: /mnt/dat1
+    label: DAT1
+    keyfile: '{{ disckey }}'
+    mkfs_type: ext4
+  - device: /dev/disk/by-id/scsi-35000cca06d159054
+    name: dat2
+    path: /mnt/dat2
+    label: DAT2
+    keyfile: '{{ disckey }}'
+    mkfs_type: ext4
+  - device: /dev/disk/by-id/scsi-35000cca06d11fcb8
+    name: dat3
+    path: /mnt/dat3
+    label: DAT3
+    keyfile: '{{ disckey }}'
+    mkfs_type: ext4
+  - device: /dev/disk/by-id/scsi-35000cca06d12ac50
+    name: dat4
+    path: /mnt/dat4
+    label: DAT4
+    keyfile: '{{ disckey }}'
+    mkfs_type: ext4
+
 mummy_main_storage_path: /mnt/storage
 extra_mountpoints:
   - { path: '{{ mummy_main_storage_path }}' }
@@ -36,7 +68,8 @@ extra_mountpoints:
 # insert mergerfs item into fstab
 mergerfs_fstab_info:
   - {
-      source: '/mnt/dat*:/mnt/tank/docs-shared:/mnt/tank/photo-wip',
+      # source: '/mnt/dat*:/mnt/tank/docs-shared:/mnt/tank/photo-wip',
+      source: '/mnt/dat*',
       mountpoint: '/mnt/storage',
       fs: fuse.mergerfs,
       opts: 'defaults,nonempty,allow_other,use_ino,moveonenospc=true,category.create=epmfs,cache.files=off,dropcacheonclose=true,minfreespace=20G,fsname=mergerfs',
@@ -46,55 +79,55 @@ mergerfs_tools_install: true
 
 # ironicbadger-snapraid
 # also used in setting up disks - fstab and crypttab
-snapraid_runner: true
-snapraid_parity_disks:
-  - {
-      name: par1,
-      path: /mnt/par1,
-      device: 'UUID=dontKnowYet',
-      fs: ext4,
-      fsopts: defaults,
-      cryptopts: luks,
-      content: false,
-    }
+# snapraid_runner: true
+# snapraid_parity_disks:
+#   - {
+#       name: par1,
+#       path: /mnt/par1,
+#       device: 'UUID=dontKnowYet',
+#       fs: ext4,
+#       fsopts: defaults,
+#       cryptopts: luks,
+#       content: false,
+#     }
 
-snapraid_data_disks:
-  - {
-      name: dat1,
-      path: /mnt/dat1,
-      device: 'UUID=b9ab9d04-1fb5-4172-9ccc-62ab639efef1',
-      fs: ext4,
-      fsopts: defaults,
-      cryptopts: luks,
-      content: true,
-    }
-  - {
-      name: dat2,
-      path: /mnt/dat2,
-      device: 'UUID=52037777-302f-4bf0-93bf-9d036e92de1f',
-      fs: ext4,
-      fsopts: defaults,
-      cryptopts: luks,
-      content: true,
-    }
-  - {
-      name: dat3,
-      path: /mnt/dat3,
-      device: 'UUID=c9a937ba-96b5-4cf5-841e-e209996e47aa',
-      fs: ext4,
-      fsopts: defaults,
-      cryptopts: luks,
-      content: true,
-    }
-  - {
-      name: dat4,
-      path: /mnt/dat4,
-      device: 'UUID=2a7cbd31-8cbe-411a-926d-6c841ea69f07',
-      fs: ext4,
-      fsopts: defaults,
-      cryptopts: luks,
-      content: true,
-    }
+# snapraid_data_disks:
+#   - {
+#       name: dat1,
+#       path: /mnt/dat1,
+#       device: 'UUID=b9ab9d04-1fb5-4172-9ccc-62ab639efef1',
+#       fs: ext4,
+#       fsopts: defaults,
+#       cryptopts: luks,
+#       content: true,
+#     }
+#   - {
+#       name: dat2,
+#       path: /mnt/dat2,
+#       device: 'UUID=52037777-302f-4bf0-93bf-9d036e92de1f',
+#       fs: ext4,
+#       fsopts: defaults,
+#       cryptopts: luks,
+#       content: true,
+#     }
+#   - {
+#       name: dat3,
+#       path: /mnt/dat3,
+#       device: 'UUID=c9a937ba-96b5-4cf5-841e-e209996e47aa',
+#       fs: ext4,
+#       fsopts: defaults,
+#       cryptopts: luks,
+#       content: true,
+#     }
+#   - {
+#       name: dat4,
+#       path: /mnt/dat4,
+#       device: 'UUID=2a7cbd31-8cbe-411a-926d-6c841ea69f07',
+#       fs: ext4,
+#       fsopts: defaults,
+#       cryptopts: luks,
+#       content: true,
+#     }
 
 filesharing_shares:
   - {

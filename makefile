@@ -13,8 +13,11 @@ update-applepi:
 mummy:
 	ansible-playbook -b run.yaml --skip-tags drivesetup --limit mummy --ask-become-pass 
 
-drivemummy:
+drive-mummy:
 	ansible-playbook -b run.yaml --limit mummy --tags drivesetup --ask-become-pass 
+
+dump-mummy:
+	ansible-playbook -b dump.yaml --limit mummy --ask-become-pass 
 
 reqs:
 	ansible-galaxy install -r requirements.yaml

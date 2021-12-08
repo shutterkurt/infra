@@ -1,0 +1,99 @@
+---
+- name: Ensure cryptsetup & zfs is installed
+  apt:
+    name:
+      - cryptsetup
+      - zfsutils-linux
+    state: latest
+    cache_valid_time: 3600
+
+- name: Confirm reformating of disks
+  ansible.builtin.pause:
+    prompt: 'This will reformat the drives!, are you sure? Type YES to reformat'
+  register: confirm_reformat1
+
+- name: Fail when not confirmed
+  ansible.builtin.fail:
+    msg: Failed confirmation, exiting
+  when: confirm_reformat1.user_input != "YES"
+
+- name: Last chance reformating of disks
+  ansible.builtin.pause:
+    prompt: 'Last chance, drives will be formatted!'
+  register: confirm_reformat2
+
+- name: Fail when not confirmed
+  ansible.builtin.fail:
+    msg: Failed confirmation, exiting
+  when: confirm_reformat2.user_input != "YES"
+
+#
+# TODO:
+# need to temp mount disk if not already mounted?
+# verify blank disks, fail if not! - can replace the above 'are you sure' confirmations
+# register some kind of variable for checking subsequent steps
+#
+#
+# create luks container on given drive
+# want to mimic
+# cryptsetup luksFormat --type luks2 /dev/DEVICE PASSPHRASEFILE
+# create the mapping and open the container
+# cryptsetup --keyfile PHASSPHRASEFILE luksOpen /dev/DEVICE MAPNAME
+- name: Create/Open LUKS container
+  community.crypto.luks_device:
+    device: '{{ item.device }}'
+    keyfile: '{{ item.keyfile }}'
+    label: '{{ item.label | default(omit) }}'
+    name: '{{ item.name }}'
+    state: opened # will create if doesn't exist
+    type: luks2
+  with_items: '{{ drivesetup_drives }}'
+  loop_control:
+    label: '{{ item.name }}'
+  no_log: true # so keyfile isn't logged!
+
+- name: Create the LUKS container filesystem
+  community.general.filesystem:
+    dev: /dev/mapper/{{ item.name }}
+    type: '{{ item.mkfs_type }}'
+    opts: '{{ item.mkfs_opts | default(omit) }}'
+  with_items: '{{ drivesetup_drives }}'
+  loop_control:
+    label: '{{ item.name }}'
+
+- name: Add LUKS mapping to /etc/crypttab
+  community.general.crypttab:
+    backing_device: '{{ item.device }}'
+    name: '{{ item.name }}'
+    opts: '{{ item.crypttab_opts | default("luks") }}'
+    password: '{{ disckey }}'
+    state: present
+  with_items: '{{ drivesetup_drives }}'
+  loop_control:
+    label: '{{ item.name }}'
+  no_log: true
+
+- name: create /mnt points
+  file:
+    dest: '{{ item.path }}'
+    state: directory
+    owner: nobody
+    group: users
+    mode: 0770
+  with_items: '{{ drivesetup_drives }}'
+  loop_control:
+    label: '{{ item.path }}'
+
+- name: Add to /etc/fstab & mount disks
+  ansible.posix.mount:
+    path: '{{ item.path }}'
+    src: '/dev/mapper/{{ item.name }}'
+    fstype: '{{ item.mkfs_type }}'
+    opts: '{{ item.mount_opts | default("defaults") }}'
+    # 'mounted' to auto mount
+    # 'present' will only change fstab but not mount
+    state: mounted
+  with_items: '{{ drivesetup_drives }}'
+  loop_control:
+    label: '{{ item.path }}'
+  when: item.path != '/mnt/storage'

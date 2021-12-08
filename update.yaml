@@ -1,15 +1,18 @@
 ---
-
-- hosts: servers
+- hosts: all
   tasks:
     # - name: import keys from github  # FIXME: update for my keys
-    #   authorized_key:  
+    #   authorized_key:
     #     user: "{{ ansible_user | default('yourname') }}"
     #     state: present
     #     key: https://github.com/ironicbadger.keys
+    #
+    # keeping update separate so can see it :)
+    - name: update apt cache
+      apt:
+        update_cache: true
+        cache_valid_time: 3600
     - name: update all packages
-      become: true
-      package:
+      apt:
         name: '*'
         state: latest
-  
