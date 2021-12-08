@@ -17,6 +17,19 @@
     state: started
     enabled: true
 
+# create an explicit samba guest user -
+# the default 'nobody' user is not part of the 'users' group
+# so can't see inside a directory created by a linux user
+# since shares have group sticky bit is set so group is overrided to 'users'
+# could change the nobody user but created a new user to be explicit
+# see conf file template - the guest account is set in the [global] section
+- name: Ensure a Samba Guest account is created
+  ansible.builtin.user:
+    name: sambaguest
+    group: users
+    create_home: no
+    state: present
+
 - name: install samba config
   ansible.builtin.template:
     src: smb.conf.j2
@@ -39,6 +52,8 @@
   with_items: '{{ filesharing_shares }}'
   loop_control:
     label: '{{ item.path }}'
+  notify:
+    - restart samba service
 
 - name: ensure that the samba users are in the users group
   ansible.builtin.user:
@@ -49,7 +64,8 @@
   loop_control:
     label: '{{ item.name }}'
   no_log: true # so password isn't logged!
-
+  notify:
+    - restart samba service
 # set user password within samba to access user share
 # - name: Configure Samba users.
 #   shell: >
@@ -62,3 +78,4 @@
 #   loop_control:
 #     label: '{{ item.username }}'
 #   when: "{{ filesharing_enable_homes }}"
+#   no_log: true # so password isn't logged!

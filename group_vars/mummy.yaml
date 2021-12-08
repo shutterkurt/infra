@@ -29,10 +29,10 @@ snapraid_config_excludes:
   - '.AppleDB'
 
 # initial mapping:
-# /dev/disk/by-id/scsi-35000cca06d15906c -> ../../sdb
-# /dev/disk/by-id/scsi-35000cca06d159054 -> ../../sdc
-# /dev/disk/by-id/scsi-35000cca06d11fcb8 -> ../../sdd
-# /dev/disk/by-id/scsi-35000cca06d12ac50 -> ../../sde
+# 2T SAS /dev/disk/by-id/scsi-35000cca06d15906c -> ../../sdb
+# 2T SAS /dev/disk/by-id/scsi-35000cca06d159054 -> ../../sdc
+# 2T SAS /dev/disk/by-id/scsi-35000cca06d11fcb8 -> ../../sdd
+# 2T SAS /dev/disk/by-id/scsi-35000cca06d12ac50 -> ../../sde
 
 drivesetup_drives:
   - device: /dev/disk/by-id/scsi-35000cca06d15906c
@@ -60,9 +60,9 @@ drivesetup_drives:
     keyfile: '{{ disckey }}'
     mkfs_type: ext4
 
-mummy_main_storage_path: /mnt/storage
-extra_mountpoints:
-  - { path: '{{ mummy_main_storage_path }}' }
+# mummy_main_storage_path: /mnt/storage
+# extra_mountpoints:
+#   - { path: '{{ mummy_main_storage_path }}' }
 
 # shutterkurt-mergerfs role
 # insert mergerfs item into fstab

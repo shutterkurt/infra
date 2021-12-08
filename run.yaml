@@ -30,3 +30,4 @@
     - role: shutterkurt-zsh
     - role: geerlingguy.security
     - role: ironicbadger.ansible_role_hddtemp
+    - role: shutterkurt-bat
