@@ -73,7 +73,7 @@
     label: '{{ item.name }}'
   no_log: true
 
-- name: create /mnt points
+- name: Ensure /mnt points exist
   file:
     dest: '{{ item.path }}'
     state: directory
@@ -97,3 +97,19 @@
   loop_control:
     label: '{{ item.path }}'
   when: item.path != '/mnt/storage'
+
+# redoing the mount point checks after the drives are
+# actually mounted as now the permissions are of the
+# permissions found at root/top of filesystem on drive
+# not of the mount point directory itself. (gets
+# overshadowed by the mounted drive)
+- name: Ensure proper permissions on mounted drives
+  file:
+    dest: '{{ item.path }}'
+    state: directory
+    owner: nobody
+    group: users
+    mode: 0775
+  with_items: '{{ drivesetup_drives }}'
+  loop_control:
+    label: '{{ item.path }}'
