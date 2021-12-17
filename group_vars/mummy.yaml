@@ -10,7 +10,11 @@ package_list_group:
   - name: cryptsetup
   - name: zfsutils-linux
 
-## snapraid
+# geerlingguy-pip
+pip_install_packages:
+  - name: docker
+
+# ironicbadger-snapraid
 snapraid_config_excludes:
   - '*.unrecoverable'
   - '/tmp/'
@@ -29,10 +33,11 @@ snapraid_config_excludes:
   - '.AppleDB'
 
 # initial mapping:
-# 2T SAS /dev/disk/by-id/scsi-35000cca06d15906c -> ../../sdb
-# 2T SAS /dev/disk/by-id/scsi-35000cca06d159054 -> ../../sdc
-# 2T SAS /dev/disk/by-id/scsi-35000cca06d11fcb8 -> ../../sdd
-# 2T SAS /dev/disk/by-id/scsi-35000cca06d12ac50 -> ../../sde
+# 2T SAS  /dev/disk/by-id/scsi-35000cca06d15906c -> ../../sdb
+# 2T SAS  /dev/disk/by-id/scsi-35000cca06d159054 -> ../../sdc
+# 2T SAS  /dev/disk/by-id/scsi-35000cca06d11fcb8 -> ../../sdd
+# 2T SAS  /dev/disk/by-id/scsi-35000cca06d12ac50 -> ../../sde
+# 4T SATA /dev/disk/by-id/ata-WDC_WD40EFRX-68N32N0_WD-WCC7K4YFTS7L -> ../../sdg
 
 drivesetup_drives:
   - device: /dev/disk/by-id/scsi-35000cca06d15906c
@@ -59,10 +64,12 @@ drivesetup_drives:
     label: DAT4
     keyfile: '{{ disckey }}'
     mkfs_type: ext4
-
-# mummy_main_storage_path: /mnt/storage
-# extra_mountpoints:
-#   - { path: '{{ mummy_main_storage_path }}' }
+  # - device: /dev/disk/by-id/ata-WDC_WD40EFRX-68N32N0_WD-WCC7K4YFTS7L
+  #   name: par1
+  #   path: /mnt/par1
+  #   label: PAR1
+  #   keyfile: '{{ disckey }}'
+  #   mkfs_type: ext4
 
 # shutterkurt-mergerfs role
 # insert mergerfs item into fstab
@@ -77,58 +84,7 @@ mergerfs_fstab_info:
 # install or not the extra python tools with mergerfs
 mergerfs_tools_install: true
 
-# ironicbadger-snapraid
-# also used in setting up disks - fstab and crypttab
-# snapraid_runner: true
-# snapraid_parity_disks:
-#   - {
-#       name: par1,
-#       path: /mnt/par1,
-#       device: 'UUID=dontKnowYet',
-#       fs: ext4,
-#       fsopts: defaults,
-#       cryptopts: luks,
-#       content: false,
-#     }
-
-# snapraid_data_disks:
-#   - {
-#       name: dat1,
-#       path: /mnt/dat1,
-#       device: 'UUID=b9ab9d04-1fb5-4172-9ccc-62ab639efef1',
-#       fs: ext4,
-#       fsopts: defaults,
-#       cryptopts: luks,
-#       content: true,
-#     }
-#   - {
-#       name: dat2,
-#       path: /mnt/dat2,
-#       device: 'UUID=52037777-302f-4bf0-93bf-9d036e92de1f',
-#       fs: ext4,
-#       fsopts: defaults,
-#       cryptopts: luks,
-#       content: true,
-#     }
-#   - {
-#       name: dat3,
-#       path: /mnt/dat3,
-#       device: 'UUID=c9a937ba-96b5-4cf5-841e-e209996e47aa',
-#       fs: ext4,
-#       fsopts: defaults,
-#       cryptopts: luks,
-#       content: true,
-#     }
-#   - {
-#       name: dat4,
-#       path: /mnt/dat4,
-#       device: 'UUID=2a7cbd31-8cbe-411a-926d-6c841ea69f07',
-#       fs: ext4,
-#       fsopts: defaults,
-#       cryptopts: luks,
-#       content: true,
-#     }
-
+# shutterkurt-filesharing
 filesharing_shares:
   - {
       name: storage,
@@ -142,6 +98,7 @@ filesharing_shares:
 filesharing_samba_users:
   - { name: '{{ main_username }}', password: '{{ secrets_main_sambapw }}' }
 
+# shutterkurt-zsh
 # assumes install of oh-my-zsh and powerlevel10K prompt
 # zsh-syntax-highlighting needs to be last! (must be last to hook into cmd line)
 zsh_user_configs:
@@ -150,5 +107,10 @@ zsh_user_configs:
       - git
       - zsh-users/zsh-syntax-highlighting
 
-security_sudoers_passwordless:
-  - '{{ main_username }}'
+#TODO: figure out what to move to the higher level all.yaml
+
+# ironicbadger.docker_compose_generator
+appdata_path: /mnt/storage/appdata
+
+# shutterkurt-services
+services_stacks_dir: 'compose/stack*.yaml'

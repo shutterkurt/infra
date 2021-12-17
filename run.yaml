@@ -31,3 +31,7 @@
     - role: geerlingguy.security
     - role: ironicbadger.ansible_role_hddtemp
     - role: shutterkurt-bat
+    - role: geerlingguy.pip
+    - role: geerlingguy.docker
+    - role: shutterkurt-services
+      tags: testing

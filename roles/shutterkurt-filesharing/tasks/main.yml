@@ -48,7 +48,7 @@
     path: '{{ item.path }}'
     owner: nobody
     group: users
-    mode: 02770
+    mode: 02775
   with_items: '{{ filesharing_shares }}'
   loop_control:
     label: '{{ item.path }}'

@@ -79,7 +79,7 @@
     state: directory
     owner: nobody
     group: users
-    mode: 0770
+    mode: 0775
   with_items: '{{ drivesetup_drives }}'
   loop_control:
     label: '{{ item.path }}'

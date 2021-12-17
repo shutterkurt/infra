@@ -1,0 +1,34 @@
+filename: sync-compose.yml
+containers:
+  #######################################################################
+  - service_name: syncthing
+    active: true
+    include_global_env_vars: true
+    image: linuxserver/syncthing
+    network_mode: 'host'
+    # instead of these port forwarding rules use host network for local discovery
+    # ports:
+    #   - 8384:8384
+    #   - 22000:22000
+    #   - 21027:21027/udp
+    volumes:
+      - '{{ appdata_path }}/syncthing:/config'
+      - '/mnt/tank:/tank'
+      - '/mnt/storage:/storage'
+      # - '{{ SHARE_DIR_ROOT }}:/shared'
+    restart: unless-stopped
+
+  #######################################################################
+  - service_name: mosquitto
+    active: true
+    include_global_env_vars: false
+    image: eclipse-mosquitto:latest
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - 1883:1883 #http
+    volumes:
+      # make sure 'total' appdata_path can be read by all
+      - '{{ appdata_path }}/mqtt/config:/mosquitto/config'
+      - '{{ appdata_path }}/mqtt/data:/mosquitto/data'
+    restart: unless-stopped

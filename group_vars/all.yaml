@@ -39,4 +39,29 @@ security_autoupdate_enabled: true
 security_fail2ban_enabled: true
 security_sudoers_passwordless:
   - '{{main_username}}'
-# docker compose stuff
+
+# geerlingguy.docker
+docker_install_compose: true
+# default version: docker_compose_version: "1.26.0"
+# current V1 latest (must be V1 if using community.docker.docker_compose):
+docker_compose_version: '1.29.2'
+# default = docker_compose_url: https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-Linux-x86_64
+# default = docker_compose_path: /usr/local/bin/docker-compose
+docker_users:
+  - '{{ main_username }}'
+# what did I set this to???  I think just log options
+# docker_daemon_options:
+#   log-opts:
+#    max-size: "100m"
+
+# ironicbadger.docker_compose_generator
+appdata_path: /mnt/storage/appdata
+global_env_vars:
+  - 'PUID={{ main_uid }}'
+  - 'PGID={{ main_gid }}'
+  - 'TZ={{ ntp_timezone }}'
+  - UMASK=<027>
+docker_compose_generator_uid: '{{ main_uid }}'
+docker_compose_generator_gid: '{{ main_gid }}'
+docker_compose_generator_user: '{{ main_username }}'
+docker_compose_generator_output_path: /home/{{ main_username }}/compose

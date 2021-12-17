@@ -1,0 +1,37 @@
+# consider add enhancement request to existing
+- name: Load container definition files
+  ansible.builtin.include_vars:
+    file: '{{ item }}'
+    # append file name without extenstion to the variable name
+    name: "{{ 'incl_vars_' ~ item|basename|splitext|first }}"
+  with_fileglob:
+    # get all stack compose info files
+    - '{{services_stacks_dir}}'
+
+- name: Create array of containers
+  set_fact:
+    # set a new variable defaulting to [] and insert/merge ('+') items created in prev step
+    services_stack_definitions: "{{ services_stack_definitions|default([]) + [lookup('vars', item)] }}"
+  loop: "{{ query('varnames', '^incl_vars_(.*)$') }}"
+
+- name: print debug
+  ansible.builtin.debug:
+    var: item
+  with_items: '{{ services_stack_definitions }}'
+  loop_control:
+    label: '{{ item.filename }}'
+
+- name: Generate container compose files
+  ansible.builtin.include_role:
+    name: ironicbadger.ansible_role_docker_compose_generator
+  vars:
+    containers: '{{ item.containers }}'
+    # docker_compose_generator_output_filename: docker-compose.yml # currently fixed and this var not used
+    # would like to do this or default to docker-compose.yml
+    docker_compose_generator_output_filename: '{{ item.filename }}'
+  with_items: '{{ services_stack_definitions }}'
+  loop_control:
+    label: '{{ item.filename }}'
+# setup service directories?
+# copy over config files?
+# run docker-compose up -d ???
