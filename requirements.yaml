@@ -43,5 +43,7 @@
 # use builtin instead?  why this??
 # builtin: docker_container or docker_compose ??
 # generates docker-compose files on the target
-- src: ironicbadger.ansible_role_docker_compose_generator
+# - src: ironicbadger.ansible_role_docker_compose_generator
+- src: git+file:///home/kurt/projects/ansible-role-docker-compose-generator
+  name: ironicbadger.ansible_role_docker_compose_generator
 #
