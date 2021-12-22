@@ -34,4 +34,5 @@
     - role: geerlingguy.pip
     - role: geerlingguy.docker
     - role: shutterkurt-services
+    - role: ironicbadger.ansible_role_snapraid
       tags: testing

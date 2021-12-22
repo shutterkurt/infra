@@ -20,6 +20,7 @@ snapraid_config_excludes:
   - '/tmp/'
   - '/lost+found/'
   - 'downloads/'
+  - 'node_modules/'
   - '*.!sync'
   - '.AppleDouble'
   - '._AppleDouble'
@@ -31,6 +32,47 @@ snapraid_config_excludes:
   - '.TemporaryItems'
   - '.Trashes'
   - '.AppleDB'
+
+###############################################################
+snapraid_force_install: false
+snapraid_bin_path: /usr/local/bin/snapraid
+snapraid_config_path: /etc/snapraid.conf
+snapraid_runner: true
+# default snapraid_runner_path: /opt/snapraid-runner/snapraid-runner
+# logs into /opt/snapraid-runner/snapraid.log
+
+# snapraid_runner_healthcheck_io_uuid: '{{ secrets_mummy_snapraid_runner_hc_uuid }}'
+# keep this empty to disable any default hc ping
+snapraid_runner_healthcheck_io_uuid: ''
+snapraid_runner_email_address: ''
+snapraid_runner_gmail_pass: ''
+snapraid_runner_email_sendon: 'success,error'
+# use a snapraid runner command so not to send anything to hc - will still get email on error once setup
+#THINK: perhaps move this to shell script to also just pass the script rtnval to hc?
+snapraid_runner_command: 'python3 {{ snapraid_runner_bin }} -c {{ snapraid_runner_conf }} > /dev/null {% if snapraid_runner_healthcheck_io_uuid %} && curl -fsS -m 10 --retry 5 -o /dev/null {{ snapraid_healthcheck_io_host }}/{{ snapraid_runner_healthcheck_io_uuid }} > /dev/null {% endif %}'
+# # snapraid_runner_command basically this:
+# # with url = the hchost/uuid
+# #  curl -fsS -m 10 --retry 5 -o /dev/null --data-binary '@-' <url> > /dev/null
+# # -fsS  fail, silent, Show error
+# # -m 10 --retry 5    10 sec timeout, retry 5 times
+# # -o /dev/null    don't show stdout
+# # --data-binary '@-'  insert stdin capture (since pipe | is used) into the hc log  REMOVED
+# snapraid_runner_cron_jobs:
+#   - { job: '{{ snapraid_runner_command }}', name: 'snapraid_runner', weekday: '*', hour: '01' }
+
+# snapraid disk setup - must follow the drivesetup_drives
+snapraid_parity_disks:
+  - path: /mnt/par1 # where the disk is
+    content: false # enables the snapraid content file on this disk
+snapraid_data_disks:
+  - path: /mnt/dat1
+    content: true
+  - path: /mnt/dat2
+    content: true
+  - path: /mnt/dat3
+    content: true
+  - path: /mnt/dat4
+    content: true
 
 # initial mapping:
 # 2T SAS  /dev/disk/by-id/scsi-35000cca06d15906c -> ../../sdb
@@ -114,3 +156,8 @@ appdata_path: /mnt/storage/appdata
 
 # shutterkurt-services
 services_stacks_dir: 'compose/stack*.yaml'
+
+# shutterkurt-mummy
+# if docker storage on zfs could have a race condition
+# currently this is not the case
+docker_zfs_override: false

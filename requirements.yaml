@@ -32,13 +32,7 @@
 - src: ironicbadger.ansible_role_hddtemp
 # builds from docker, installs, configures snapraid
 # and either installs cron job or snapraidrunner for periodic scrubs
-# - src: ironicbadger.ansible_role_snapraid
-
-# install, configure, manage telegraf
-# - src: rossmcdonald.telegraf
-
-# not now
-# - src: ironicbadger.ansible_role_proxmox_nag_removal
+- src: ironicbadger.ansible_role_snapraid
 
 # use builtin instead?  why this??
 # builtin: docker_container or docker_compose ??
