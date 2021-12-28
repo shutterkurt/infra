@@ -17,18 +17,3 @@ containers:
       - '/mnt/storage:/storage'
       # - '{{ SHARE_DIR_ROOT }}:/shared'
     restart: unless-stopped
-
-  #######################################################################
-  - service_name: mosquitto
-    active: true
-    include_global_env_vars: false
-    image: eclipse-mosquitto:latest
-    security_opt:
-      - no-new-privileges:true
-    ports:
-      - 1883:1883 #http
-    volumes:
-      # make sure 'total' appdata_path can be read by all
-      - '{{ appdata_path }}/mqtt/config:/mosquitto/config'
-      - '{{ appdata_path }}/mqtt/data:/mosquitto/data'
-    restart: unless-stopped

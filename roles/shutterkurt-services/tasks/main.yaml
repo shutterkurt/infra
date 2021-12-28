@@ -26,6 +26,7 @@
     name: ironicbadger.ansible_role_docker_compose_generator
   vars:
     containers: '{{ item.containers }}'
+    volumes: '{{ item.volumes | default("") }}'
     # docker_compose_generator_output_filename: docker-compose.yml # currently fixed and this var not used
     # would like to do this or default to docker-compose.yml
     docker_compose_generator_output_filename: '{{ item.filename }}'
@@ -35,3 +36,33 @@
 # setup service directories?
 # copy over config files?
 # run docker-compose up -d ???
+#
+#  the following is OBE - something is screwy with influxdb permissions so just using a docker volume instead
+# - name: Ensure an influxdb group is created
+#   ansible.builtin.group:
+#     name: influxdb
+#     state: present
+# - name: Ensure an influxdb account is created
+#   ansible.builtin.user:
+#     name: influxdb
+#     group: influxdb
+#     create_home: no
+#     state: present
+
+# - name: ensure that the main user is in the influxdb group
+#   ansible.builtin.user:
+#     name: '{{ main_username }}'
+#     groups: influxdb
+#     append: yes
+#     state: present
+
+# grafana uses the 'grafana' user (472) with 'root' group (0)
+# and have directory open to users group
+# or run the container with main_username
+# - name: Ensure an grafana account is created
+#   ansible.builtin.user:
+#     name: grafana
+#     id???: 472    what is proper field name here???
+#     group: users
+#     create_home: no
+#     state: present

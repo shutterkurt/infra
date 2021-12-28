@@ -1,0 +1,101 @@
+filename: infra-compose.yml
+volumes:
+  influxdb_data:
+    external: true
+  influxdb_config:
+    external: true
+containers:
+  #######################################################################
+  - service_name: mosquitto
+    active: true
+    include_global_env_vars: false
+    image: eclipse-mosquitto:latest
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - 1883:1883 #http
+    volumes:
+      # make sure 'total' appdata_path can be read by all
+      - '{{ appdata_path }}/mqtt/config:/mosquitto/config'
+      - '{{ appdata_path }}/mqtt/data:/mosquitto/data'
+    restart: unless-stopped
+
+  #######################################################################
+  # InfluxDB - Database for sensor data
+  # 1. create the dirs for volumes
+  # 2. Create influxdb.conf:        ????  do I need to????
+  # docker run --rm influxdb:2.1.1 influxd print-config > config.yml
+  # then edit - verify engine-path, bolt-path to point into /var/lib/influxdb2
+  # reporting-disabled: true
+  # or environment INFLUXD_REPORTING_DISABLED=true
+  # precedence: cli > environment > config file
+  # then open browser
+  - service_name: influxdb
+    active: true
+    include_global_env_vars: false
+    image: influxdb:2.1.1
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - 8086:8086
+    environment:
+      - 'INFLUXD_REPORTING_DISABLED=true' # disable telemetry reporting
+      - 'DOCKER_INFLUXDB_INIT_MODE=setup'
+      - 'DOCKER_INFLUXDB_INIT_USERNAME={{ main_username }}'
+      - 'DOCKER_INFLUXDB_INIT_PASSWORD=password' # change on first login!
+      - 'DOCKER_INFLUXDB_INIT_ORG=mummy-org'
+      - 'DOCKER_INFLUXDB_INIT_BUCKET=init-bucket' # change retention on first login!
+    volumes:
+      # - '{{ appdata_path }}/influxdb/data:/var/lib/influxdb2'
+      # - '{{ appdata_path }}/influxdb/config:/etc/influxdb2'
+      - 'influxdb_data:/var/lib/influxdb2'
+      - 'influxdb_config:/etc/influxdb2'
+
+  #######################################################################
+  - service_name: telegraf
+    active: true
+    include_global_env_vars: false
+    image: telegraf:latest
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    depends_on:
+      - influxdb
+    volumes:
+      - '{{ appdata_path }}/telegraf/etc/telegraf.conf:/etc/telegraf/telegraf.conf:ro'
+
+  #######################################################################
+  # grafana uses the 'grafana' user (472) with 'root' group (0)
+  - service_name: grafana
+    active: true
+    include_global_env_vars: false
+    image: grafana/grafana:latest
+    restart: unless-stopped
+    user: '"1000"'
+    security_opt:
+      - no-new-privileges:true
+    depends_on:
+      - influxdb
+    ports:
+      - 3000:3000
+    volumes:
+      - '{{ appdata_path }}/grafana/data:/var/lib/grafana'
+  # uncomment this if you wanta to allow anonymus acces to Grafana for embedding (e.g. in Home Assistant dashboards)
+  #environment:
+  #  - GF_AUTH_DISABLE_LOGIN_FORM=true
+  #  - GF_AUTH_ANONYMOUS_ENABLED=true
+  #  - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+  #  - GF_SECURITY_ALLOW_EMBEDDING=true
+  - service_name: heimdall
+    active: true
+    include_global_env_vars: true
+    image: lscr.io/linuxserver/heimdall
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - '{{ appdata_path }}/heimdall/config:/config'
