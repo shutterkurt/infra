@@ -6,11 +6,16 @@
     - name: query github for latest release
       uri:
         url: '{{bat_github_releases_url}}/latest'
+        timeout: 10
       register: bat_github_latest_page
+      retries: 3 # 3 strikes
+      delay: 5 # retry interval
     - name: extract version and set fact
       set_fact:
         bat_version: "{{ bat_github_latest_page['url'].split('/')[-1] }}"
   when: bat_version == "latest"
+
+#TODO: add logic to only download IF not already installed to latest version
 
 - name: determine package download url
   set_fact:

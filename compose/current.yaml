@@ -1,0 +1,44 @@
+filename: other-compose.yml
+containers:
+  #######################################################################
+  - service_name: diun
+    active: false
+    image: crazymax/diun:latest
+    include_global_env_vars: false
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - '{{ appdata_path }}/diun/data:/data'
+      - '/var/run/docker.sock:/var/run/docker.sock'
+    environment:
+      - 'TZ=US/Eastern'
+      - 'LOG_LEVEL=info'
+      - 'LOG_JSON=false'
+      - 'DIUN_WATCH_WORKERS=20'
+      - 'DIUN_WATCH_SCHEDULE=0 6 * * *'
+      - 'DIUN_PROVIDERS_DOCKER=true'
+      - 'DIUN_PROVIDERS_DOCKER_WATCHSTOPPED=true'
+      - 'DIUN_NOTIF_GOTIFY_ENDPOINT={{ DIUN_GOTIFY_ENDPOINT }}'
+      - 'DIUN_NOTIF_GOTIFY_TOKEN={{ DIUN_GOTIFY_TOKEN }}'
+      # - "DIUN_NOTIF_GOTIFY_PRIORITY=2"
+    labels:
+      - 'diun.enable=true'
+      - 'diun.watch_repo=true'
+    depends_on:
+      - gotify
+
+  #######################################################################
+  - service_name: gotify
+    active: false
+    image: gotify/server
+    include_global_env_vars: false
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - TZ=US/Eastern
+    volumes:
+      - '{{ appdata_path }}/gotify/data:/app/data'
+    ports:
+      - 8080:80

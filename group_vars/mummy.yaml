@@ -41,9 +41,9 @@ snapraid_runner: true
 # default snapraid_runner_path: /opt/snapraid-runner/snapraid-runner
 # logs into /opt/snapraid-runner/snapraid.log
 
-# snapraid_runner_healthcheck_io_uuid: '{{ secrets_mummy_snapraid_runner_hc_uuid }}'
+snapraid_runner_healthcheck_io_uuid: '{{ secrets_mummy_snapraid_runner_hc_uuid }}'
 # keep this empty to disable any default hc ping
-snapraid_runner_healthcheck_io_uuid: ''
+# snapraid_runner_healthcheck_io_uuid: ''
 snapraid_runner_email_address: ''
 snapraid_runner_gmail_pass: ''
 snapraid_runner_email_sendon: 'success,error'
