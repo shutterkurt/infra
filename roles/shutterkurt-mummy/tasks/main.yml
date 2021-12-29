@@ -5,3 +5,6 @@
 # i.e. force docker not to start unless zfs is started
 # fixes possible race condition between zfs mounting drives
 # and docker trying to use them
+# - name: override docker service for zfs dependencies
+#   include: docker-zfs-override.yml
+#   when: docker_zfs_override
