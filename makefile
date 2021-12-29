@@ -2,7 +2,7 @@ ping:
 	ansible all -m ping
 
 applepi:
-	ansible-playbook -b raspberies.yaml --limit applepi --tags install_bat --ask-become-pass 
+	ansible-playbook -b raspberies.yaml --limit applepi --tags testing --ask-become-pass 
 
 dump-applepi:
 	ansible-playbook -b dump.yaml --limit applepi --ask-become-pass 

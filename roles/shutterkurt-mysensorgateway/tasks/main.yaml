@@ -47,18 +47,40 @@
     target: all
   become: true
   become_user: '{{ msgw_username }}'
-# copy over a sensable config file
+  notify: restart mysgw
 
-#   notify: restart msgw
-# - name: Install MySensors Gateway
-#   community.general.make:
-#     chdir: '{{ msgw_dir }}'
-#     target: install
-#   become: true
-#   notify: restart msgw
-# - name: Ensure MySensors Gateway service is enabled/started
-#   service:
-#     name: msgw
-#     state: started
-#     enabled: true
+- name: Ensure config file exists
+  ansible.builtin.template:
+    src: mysensors.conf.j2
+    dest: /etc/mysensors.conf
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
+    backup: yes
+  notify:
+    - restart mysgw
 
+- name: Ensure logs are rotated
+  ansible.builtin.blockinfile:
+    path: '/etc/logrotate.d/{{ item.name }}'
+    block: '{{ item.conf }}'
+    create: true
+    owner: root
+    group: root
+    mode: 0644
+  loop: '{{ msgw_log_rotate_confd }}'
+  when: msgw_logging_enable and msgw_log_rotate_enable
+
+- name: Install MySensors Gateway (copy bin & create service file)
+  community.general.make:
+    chdir: '{{ msgw_dir }}'
+    target: install
+  become: true
+  notify: restart mysgw
+
+# the make install only copies the bin and creates the msgw.service file but not enable nor start
+- name: Ensure MySensors Gateway service is enabled/started
+  service:
+    name: mysgw
+    state: started
+    enabled: true

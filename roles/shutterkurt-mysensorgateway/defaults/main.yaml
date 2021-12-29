@@ -7,7 +7,25 @@ msgw_repo_version: development
 # working directory to clone the repo and configure/build in
 msgw_dir: /tmp/msgw_install
 # forces configure to rerun by deleting the configure output (Makefile.inc)
-msgw_rerun_configure: true
+msgw_rerun_configure: false
 # the configure parameters - most likely need to give something
 # run configure -h in working directory after clone to see options
 msgw_configure_parameters: ''
+# logging
+msgw_logging_enable: true
+msgw_log_filepath: /var/log/mysgw.log
+msgw_log_rotate_enable: true
+msgw_log_rotate_size: 10M
+msgw_log_rotate_num: 3
+msgw_log_rotate_confd:
+  - name: mysgw
+    conf: |
+      {{ msgw_log_filepath }} 
+      {
+          rotate {{ msgw_log_rotate_num }}
+          size {{ msgw_log_rotate_size }}
+          compress
+          delaycompress
+          notifempty
+          missingok
+      }

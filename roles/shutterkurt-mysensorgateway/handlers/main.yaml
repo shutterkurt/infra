@@ -1,0 +1,4 @@
+- name: restart mysgw
+  service:
+    name: mysgw
+    state: restarted

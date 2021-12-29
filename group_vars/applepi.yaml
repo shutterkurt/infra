@@ -22,5 +22,8 @@ security_sudoers_passwordless:
 
 # role: shutterkurt-msgw
 msgw_username: '{{ main_username }}'
-msgw_configure_parameters: '--soc=BCM2835 --my-transport=rf24 --my-rf24-ce-pin=29 --my-debug=enable --my-rf24-cs-pin=26'
+# msgw_configure_parameters: '--soc=BCM2835 --my-transport=rf24 --my-rf24-ce-pin=29 --my-debug=enable --my-rf24-cs-pin=26'
+# msgw_configure_parameters: '--soc=BCM2835 --my-transport=rf24 --my-rf24-ce-pin=5 --my-debug=enable --my-rf24-cs-pin=7'
+# msgw_configure_parameters: '--my-transport=rf24 --my-rf24-ce-pin=5 --spi-spidev-device=/dev/spidev0.1 --my-debug=enable'
+msgw_configure_parameters: --my-transport=rf24 --spi-driver=SPIDEV --spi-spidev-device=/dev/spidev0.1 --my-debug=enable --my-rf24-ce-pin=5
 msgw_rerun_configure: false

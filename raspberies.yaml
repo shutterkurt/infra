@@ -9,7 +9,7 @@
     - role: grog.package
     - role: geerlingguy.security
     - role: shutterkurt-zsh
-    - role: shutterkurt-mysensorgateway
-      tags: testing
     - role: shutterkurt-bat
       tags: install_bat
+    - role: shutterkurt-mysensorgateway
+      tags: testing
