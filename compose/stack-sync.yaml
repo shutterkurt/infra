@@ -4,7 +4,7 @@ containers:
   - service_name: syncthing
     active: true
     include_global_env_vars: true
-    image: linuxserver/syncthing
+    image: linuxserver/syncthing:1.18.6
     network_mode: 'host'
     # instead of these port forwarding rules use host network for local discovery
     # ports:

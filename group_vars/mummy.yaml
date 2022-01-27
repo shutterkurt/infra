@@ -32,6 +32,7 @@ snapraid_config_excludes:
   - '.TemporaryItems'
   - '.Trashes'
   - '.AppleDB'
+  - 'heimdall/config/log/'
 
 ###############################################################
 snapraid_force_install: false
@@ -46,7 +47,10 @@ snapraid_runner_healthcheck_io_uuid: '{{ secrets_mummy_snapraid_runner_hc_uuid }
 # snapraid_runner_healthcheck_io_uuid: ''
 snapraid_runner_email_address: ''
 snapraid_runner_gmail_pass: ''
-snapraid_runner_email_sendon: 'success,error'
+snapraid_runner_email_sendon: 'error'
+snapraid_runner_smtp_host: '' # keep empty to short circuit email sending
+# snapraid_runner_smtp_host: smtp.gmail.com
+
 # use a snapraid runner command so not to send anything to hc - will still get email on error once setup
 #THINK: perhaps move this to shell script to also just pass the script rtnval to hc?
 snapraid_runner_command: 'python3 {{ snapraid_runner_bin }} -c {{ snapraid_runner_conf }} > /dev/null {% if snapraid_runner_healthcheck_io_uuid %} && curl -fsS -m 10 --retry 5 -o /dev/null {{ snapraid_healthcheck_io_host }}/{{ snapraid_runner_healthcheck_io_uuid }} > /dev/null {% endif %}'

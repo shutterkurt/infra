@@ -88,7 +88,7 @@ containers:
   #  - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
   #  - GF_SECURITY_ALLOW_EMBEDDING=true
   - service_name: heimdall
-    active: true
+    active: false
     include_global_env_vars: true
     image: lscr.io/linuxserver/heimdall
     restart: unless-stopped
