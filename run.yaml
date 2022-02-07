@@ -36,3 +36,4 @@
     - role: shutterkurt-services
     - role: ironicbadger.ansible_role_snapraid
       tags: testing
+    - role: shutterkurt-mummy

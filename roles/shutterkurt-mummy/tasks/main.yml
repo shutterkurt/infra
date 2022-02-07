@@ -1,3 +1,14 @@
+- name: Copy load keys service file
+  copy:
+    src: zfs-load-key.service
+    dest: /etc/systemd/system
+    owner: root
+    group: root
+
+- name: Ensure load key service is enabled at boot
+  ansible.builtin.systemd:
+    name: zfs-load-key.service
+    enabled: yes
 #
 #
 #  FIXME: copy over the zfs override for docker
