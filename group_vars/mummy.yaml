@@ -15,6 +15,8 @@ pip_install_packages:
   - name: docker
 
 # ironicbadger-snapraid
+# remember if absolute path, then starts at the 'array root'
+# in my case this is '/mnt/d1', '/mnt/d2', etc
 snapraid_config_excludes:
   - '*.unrecoverable'
   - '/tmp/'
@@ -32,7 +34,8 @@ snapraid_config_excludes:
   - '.TemporaryItems'
   - '.Trashes'
   - '.AppleDB'
-  - 'heimdall/config/log/'
+  - '/appdata/heimdall/config/log/'
+  - '/appdata/synchthing/*/*.log'
 
 ###############################################################
 snapraid_force_install: false
