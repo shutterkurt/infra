@@ -99,3 +99,83 @@ containers:
       - 443:443
     volumes:
       - '{{ appdata_path }}/heimdall/config:/config'
+  # ###############################################################################
+  # Gitea - a local git server
+  - service_name: gitea
+    active: true
+    include_global_env_vars: false
+    image: gitea/gitea:1.16.9
+    environment:
+      - USER_UID=1000
+      - USER_GUID=1000
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - '3100:3000'
+      - '222:22'
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      - '{{ appdata_path }}/gitea/data:/data'
+  # ###############################################################################
+  # restic/rest-server - http/https backend server for restic
+  - service_name: restic-server
+    active: true
+    include_global_env_vars: false
+    image: restic/rest-server:0.11.0
+    environment:
+      - DISABLE_AUTHENTICATION=1
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - '8000:8000'
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      - '{{ appdata_path }}/restic-server/data:/data'
+  # ###############################################################################
+  # minio - S3 object storage
+  - service_name: minio
+    active: true
+    include_global_env_vars: false
+    image: quay.io/minio/minio
+    command:
+      - server
+      - /data
+      - --console-address
+      - ':9001'
+    environment:
+      # initial root password - make sure to change it!
+      - MINIO_ROOT_USER=admin
+      - MINIO_ROOT_PASSWORD=somesecret
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      - '{{ appdata_path }}/minio/data:/data'
+  # ###############################################################################
+  # dashy - dashboard / homepage
+  - service_name: dashy
+    active: true
+    include_global_env_vars: false
+    image: lissy93/dashy
+    environment:
+      - NODE_ENV=production
+      - UID=1000
+      - GID=1000
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - 4000:80
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      - '{{ appdata_path }}/dashy/config.yml:/app/public/conf.yml'

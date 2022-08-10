@@ -128,7 +128,7 @@ mergerfs_fstab_info:
       source: '/mnt/dat*',
       mountpoint: '/mnt/storage',
       fs: fuse.mergerfs,
-      opts: 'defaults,nonempty,allow_other,use_ino,moveonenospc=true,category.create=epmfs,cache.files=off,dropcacheonclose=true,minfreespace=20G,fsname=mergerfs',
+      opts: 'defaults,nonempty,allow_other,use_ino,moveonenospc=true,category.create=mfs,cache.files=off,dropcacheonclose=true,minfreespace=20G,fsname=mergerfs',
     }
 # install or not the extra python tools with mergerfs
 mergerfs_tools_install: true

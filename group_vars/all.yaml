@@ -19,6 +19,8 @@ package_list:
   - name: htop
   - name: net-tools
   - name: python3
+  - name: rclone
+  - name: restic
   - name: rsync
   - name: sudo
   - name: tmux
