@@ -120,10 +120,13 @@ containers:
       - '{{ appdata_path }}/gitea/data:/data'
   # ###############################################################################
   # restic/rest-server - http/https backend server for restic
+  # if https, need docker exec -it rest_server create_user myuser mypassword
+  # docker exec -it rest_server delete_user myuser
   - service_name: restic-server
     active: true
     include_global_env_vars: false
     image: restic/rest-server:0.11.0
+    user: 1000:1000
     environment:
       - DISABLE_AUTHENTICATION=1
     restart: unless-stopped
