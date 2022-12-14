@@ -3,6 +3,7 @@ myhostname: mummy
 
 # grog.package - extra packages for this group/server
 package_list_group:
+  - name: build-essential
   - name: iftop
   - name: iotop
   - name: lm-sensors
@@ -34,8 +35,9 @@ snapraid_config_excludes:
   - '.TemporaryItems'
   - '.Trashes'
   - '.AppleDB'
-  - '/appdata/heimdall/config/log/'
-  - '/appdata/synchthing/*/*.log'
+  - '/appdata/heimdall/'
+  - '/appdata/synchthing/'
+  - '/appdata/grafana'
 
 ###############################################################
 snapraid_force_install: false

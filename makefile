@@ -19,6 +19,11 @@ drive-mummy:
 dump-mummy:
 	ansible-playbook -b dump.yaml --limit mummy --ask-become-pass 
 
+gypsy:
+	ansible-playbook -b run.yaml --skip-tags drivesetup --limit gypsy --ask-become-pass 
+dump-gypsy:
+	ansible-playbook -b dump.yaml --limit gypsy --ask-become-pass 
+
 reqs:
 	ansible-galaxy install -r requirements.yaml
 

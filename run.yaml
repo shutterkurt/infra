@@ -37,3 +37,11 @@
     - role: ironicbadger.ansible_role_snapraid
       tags: testing
     - role: shutterkurt-mummy
+
+- hosts: gypsy
+  vars_files:
+    - 'vars/vault.yaml'
+  roles:
+    - role: grog.package
+    # - role: geerlingguy.security
+    # - role: geerlingguy.pip

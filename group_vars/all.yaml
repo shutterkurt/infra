@@ -13,7 +13,6 @@ disckey: '{{ secrets_disckey }}'
 # common package list - override in group/host vars
 # should I do it this way? i.e. it will just merge + uniqify
 package_list:
-  - name: build-essential
   - name: curl
   - name: git
   - name: htop

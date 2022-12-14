@@ -1,0 +1,14 @@
+---
+myhostname: gypsy
+
+# grog.package - extra packages for this group/server
+package_list_group:
+  - name: bat
+  - name: xorg
+  - name: xf86-video-intel
+  - name: mesa
+  - name: lxqt
+  - name: breeze-icons
+  - name: sddm
+  - name: xscreensaver
+package_update_cache: yes
