@@ -1,0 +1,70 @@
+# - name: Do debug print
+#   ansible.builtin.debug:
+#     msg: '{{ ansible_devices | json_query(query_string) }}'
+#   vars:
+#     query_string: '*.serial'
+# TODO: use json_query to check if drive has filesystem/mounted already!
+# then assert or skip if already done
+
+#  TODO: edit these to remove, then add single partition with filesystem
+# tweak variables as necessary
+- name: Read device information (always use unit when probing)
+  community.general.parted:
+    device: /dev/sdb
+    unit: MiB
+  register: sdb_info
+- name: Debug print drive information
+  ansible.builtin.debug:
+    msg: '{{ sdb_info }}'
+    verbosity: 1
+
+# - name: Remove all partitions from disk
+#   community.general.parted:
+#     device: /dev/sdb
+#     number: '{{ item.num }}'
+#     state: absent
+#   loop: '{{ sdb_info.partitions }}'
+
+# - name: Create a new ext4 primary partition
+#   community.general.parted:
+#     device: /dev/sdb
+#     number: 1
+#     state: present
+#     fs_type: ext4
+
+# for now, do this manually
+# partion drive with sudo cfdisk /dev/sdb  and write the partion table
+# then sudo mkfs -t ext4 /dev/sdb1  for each partion
+
+- name: Ensure mount points exist
+  with_items: '{{ ha_drives }}'
+  loop_control:
+    label: '{{ item.path }}'
+  vars:
+    dir_path: '{{ item.path }}'
+  ansible.builtin.include_tasks: ensureDirExists.yaml
+
+- name: Add to /etc/fstab & mount disks
+  ansible.posix.mount:
+    path: '{{ item.path }}'
+    src: 'UUID={{ item.uuid }}'
+    fstype: '{{ item.mkfs_type }}'
+    opts: '{{ item.mount_opts | default("defaults") }}'
+    # 'mounted' to auto mount
+    # 'present' will only change fstab but not mount
+    state: mounted
+  with_items: '{{ ha_drives }}'
+  loop_control:
+    label: '{{ item.path }}'
+
+# after drive is mounted, the root dir user/permissions 'override' mount points
+- name: After mount - check drive root permissions
+  ansible.builtin.file:
+    dest: '{{ item.path }}'
+    state: directory
+    mode: 0775 # or should this be 0750  or use become user so user's umask is used
+    owner: '{{ main_username }}'
+    group: '{{ main_groupname }}'
+  with_items: '{{ ha_drives }}'
+  loop_control:
+    label: '{{ item.path }}'

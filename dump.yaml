@@ -1,12 +1,15 @@
 ---
 - name: Dump
   hosts: all
+  gather_facts: false
   tasks:
     - name: Facts
-      setup:
+      ansible.builtin.setup:
     - name: Dump
       delegate_to: localhost
-      run_once: true
-      copy:
+      # run_once: true
+      become: false
+      ansible.builtin.copy:
         content: '{{ hostvars[inventory_hostname] | to_nice_json }}'
         dest: setup-dump.json
+        mode: 0755

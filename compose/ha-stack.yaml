@@ -1,0 +1,126 @@
+# code: language=yaml
+
+filename: docker-compose.yml
+containers:
+  #######################################################################
+  # from website: https://docs.portainer.io/start/install/server/docker/linux
+  # docker run -d -p 8000:8000 -p 9443:9443 --name portainer --restart=always
+  # 9443 is the https port - 9000 is the http version
+  # -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce:latest
+  - service_name: portainer
+    active: true
+    include_global_env_vars: false
+    image: portainer/portainer-ce
+    ports:
+      - 8000:8000
+      - 9443:9443
+      - 9000:9000
+    volumes:
+      - '{{ appdata_path }}/portainer:/data'
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - 'TZ={{ ntp_timezone }}'
+    restart: unless-stopped
+
+  # FIXME: add Duin - notifier
+  # FIXME: get push bullet or other for DUIN to send to, as well as
+
+  #######################################################################
+  # https://www.home-assistant.io/installation/linux#docker-compose
+  - service_name: homeassistant
+    active: true
+    include_global_env_vars: false
+    image: ghcr.io/home-assistant/home-assistant:stable
+    network_mode: 'host'
+    # instead of these port forwarding rules use host network for local discovery
+    # ports:
+    #   - 8384:8384
+    #   - 22000:22000
+    #   - 21027:21027/udp
+    volumes:
+      - '{{ appdata_path }}/homeassistant/config:/config'
+      - /etc/localtime:/etc/localtime:ro
+    restart: unless-stopped
+
+  #######################################################################
+  - service_name: mosquitto
+    active: false
+    include_global_env_vars: false
+    image: eclipse-mosquitto:latest
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - 1883:1883 #http
+    volumes:
+      # make sure 'total' appdata_path can be read by all
+      - '{{ appdata_path }}/mqtt/config:/mosquitto/config'
+      - '{{ appdata_path }}/mqtt/data:/mosquitto/data'
+    restart: unless-stopped
+
+  #######################################################################
+  # InfluxDB - Database for sensor data
+  # 1. create the dirs for volumes
+  # 2. Create influxdb.conf:        ????  do I need to????
+  # docker run --rm influxdb:2.1.1 influxd print-config > config.yml
+  # then edit - verify engine-path, bolt-path to point into /var/lib/influxdb2
+  # reporting-disabled: true
+  # or environment INFLUXD_REPORTING_DISABLED=true
+  # precedence: cli > environment > config file
+  # then open browser
+  - service_name: influxdb
+    active: false
+    include_global_env_vars: false
+    image: influxdb:2.1.1
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - 8086:8086
+    environment:
+      - 'INFLUXD_REPORTING_DISABLED=true' # disable telemetry reporting
+      - 'DOCKER_INFLUXDB_INIT_MODE=setup'
+      - 'DOCKER_INFLUXDB_INIT_USERNAME={{ main_username }}'
+      - 'DOCKER_INFLUXDB_INIT_PASSWORD=password' # change on first login!
+      - 'DOCKER_INFLUXDB_INIT_ORG=mummy-org'
+      - 'DOCKER_INFLUXDB_INIT_BUCKET=init-bucket' # change retention on first login!
+    volumes:
+      # - '{{ appdata_path }}/influxdb/data:/var/lib/influxdb2'
+      # - '{{ appdata_path }}/influxdb/config:/etc/influxdb2'
+      - 'influxdb_data:/var/lib/influxdb2'
+      - 'influxdb_config:/etc/influxdb2'
+
+  #######################################################################
+  - service_name: telegraf
+    active: false
+    include_global_env_vars: false
+    image: telegraf:latest
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    depends_on:
+      - influxdb
+    volumes:
+      - '{{ appdata_path }}/telegraf/etc/telegraf.conf:/etc/telegraf/telegraf.conf:ro'
+
+  #######################################################################
+  # grafana uses the 'grafana' user (472) with 'root' group (0)
+  - service_name: grafana
+    active: false
+    include_global_env_vars: false
+    image: grafana/grafana:latest
+    restart: unless-stopped
+    user: '"1000"'
+    security_opt:
+      - no-new-privileges:true
+    depends_on:
+      - influxdb
+    ports:
+      - 3000:3000
+    volumes:
+      - '{{ appdata_path }}/grafana/data:/var/lib/grafana'
+  # uncomment this if you wanta to allow anonymus acces to Grafana for embedding (e.g. in Home Assistant dashboards)
+  #environment:
+  #  - GF_AUTH_DISABLE_LOGIN_FORM=true
+  #  - GF_AUTH_ANONYMOUS_ENABLED=true
+  #  - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+  #  - GF_SECURITY_ALLOW_EMBEDDING=true

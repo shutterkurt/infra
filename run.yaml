@@ -1,9 +1,10 @@
 ---
-- hosts: all
+- name: Remove MOTD SPAM
+  hosts: all
   tasks: # THINK: consider using pre_tasks / post_tasks instead as tasks is run after roles!
-    - name: remove ubuntu motd spam
+    - name: Remove ubuntu motd spam
       become: true
-      file:
+      ansible.builtin.file:
         path: '/etc/update-motd.d/{{ item }}'
         state: absent
       loop:
@@ -12,7 +13,8 @@
         - 10-help-text
       when: ansible_distribution == 'Ubuntu'
 
-- hosts: mummy
+- name: Setup Drives for Mummy
+  hosts: mummy
   vars_files:
     - 'vars/vault.yaml'
   roles:
@@ -21,7 +23,8 @@
   tags:
     - drivesetup
 
-- hosts: mummy
+- name: Setup Mummy
+  hosts: mummy
   vars_files:
     - 'vars/vault.yaml'
   roles:
@@ -29,19 +32,34 @@
     - role: shutterkurt-filesharing
     - role: shutterkurt-zsh
     - role: geerlingguy.security
-    - role: ironicbadger.ansible_role_hddtemp
+    - role: ironicbadger.hddtemp
     - role: shutterkurt-bat
     - role: geerlingguy.pip
     - role: geerlingguy.docker
     - role: shutterkurt-services
-    - role: ironicbadger.ansible_role_snapraid
+    - role: ironicbadger.snapraid
       tags: testing
     - role: shutterkurt-mummy
 
-- hosts: gypsy
+- name: Setup gypsy
+  hosts: gypsy
   vars_files:
     - 'vars/vault.yaml'
   roles:
     - role: grog.package
     # - role: geerlingguy.security
     # - role: geerlingguy.pip
+
+- name: Setup HA
+  hosts: homeassistant
+  vars_files:
+    - 'vars/vault.yaml'
+  roles:
+    - role: grog.package
+    - role: shutterkurt-zsh
+    - role: geerlingguy.security
+    # - role: ironicbadger.hddtemp
+    - role: shutterkurt-bat
+    - role: geerlingguy.pip
+    - role: geerlingguy.docker
+    - role: shutterkurt-ha

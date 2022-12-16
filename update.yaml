@@ -1,5 +1,6 @@
 ---
-- hosts: all
+- name: Update All
+  hosts: all
   tasks:
     # - name: import keys from github  # FIXME: update for my keys
     #   authorized_key:
@@ -8,11 +9,12 @@
     #     key: https://github.com/ironicbadger.keys
     #
     # keeping update separate so can see it :)
-    - name: update apt cache
-      apt:
+    # FIXME: update so work with arch - at least put in only if ubuntu
+    - name: Update apt cache
+      ansible.builtin.apt:
         update_cache: true
         cache_valid_time: 3600
-    - name: update all packages
-      apt:
+    - name: Update all packages
+      ansible.builtin.apt:
         name: '*'
         state: latest

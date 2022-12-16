@@ -1,0 +1,6 @@
+- name: Testing Playbook
+  hosts: homeassistant
+  vars_files:
+    - 'vars/vault.yaml'
+  roles:
+    - role: shutterkurt-ha-drives

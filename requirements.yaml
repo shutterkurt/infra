@@ -29,10 +29,10 @@
 # - src: geerlingguy.github-users
 
 # installs and configures hddtemp for debian
-- src: ironicbadger.ansible_role_hddtemp
+- src: ironicbadger.hddtemp
 # builds from docker, installs, configures snapraid
 # and either installs cron job or snapraidrunner for periodic scrubs
-- src: ironicbadger.ansible_role_snapraid
+- src: ironicbadger.snapraid
 
 # use builtin instead?  why this??
 # builtin: docker_container or docker_compose ??

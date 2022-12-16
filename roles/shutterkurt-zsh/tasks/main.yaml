@@ -1,6 +1,6 @@
 ---
 - name: Ensure zsh, git are installed
-  apt:
+  ansible.builtin.apt:
     name:
       - zsh
       - git
@@ -21,7 +21,7 @@
     label: '{{ item.username }}'
 
 - name: Ensure zsh-antigen is NOT installed (had issues in the past)
-  apt:
+  ansible.builtin.apt:
     name:
       - zsh-antigen
     state: absent
@@ -40,9 +40,9 @@
   ansible.builtin.git:
     repo: https://github.com/zsh-users/antigen.git
     dest: '~{{ item.username }}/.antigen'
-    clone: yes
-    update: yes
-  become: yes
+    clone: true
+    update: true
+  become: true
   become_user: '{{ item.username }}'
   with_items: '{{ zsh_user_configs }}'
   loop_control:
@@ -53,8 +53,10 @@
     src: zshrc.zsh.j2
     dest: '~{{ item.username }}/.zshrc.example'
     owner: '{{ item.username }}'
-    backup: yes
-  become: yes
+    group: '{{ item.group }}'
+    mode: 0664
+    backup: true
+  become: true
   become_user: '{{ item.username }}'
   vars:
     bundles: '{{ item.antigen_bundles }}'
@@ -67,7 +69,9 @@
     src: .p10k.zsh
     dest: '~{{ item.username }}/.p10k.zsh'
     owner: '{{ item.username }}'
-    backup: yes
+    group: '{{ item.group }}'
+    mode: 0664
+    backup: true
   with_items: '{{ zsh_user_configs }}'
   loop_control:
     label: '{{ item.username }}'

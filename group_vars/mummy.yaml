@@ -57,7 +57,7 @@ snapraid_runner_smtp_host: '' # keep empty to short circuit email sending
 # snapraid_runner_smtp_host: smtp.gmail.com
 
 # use a snapraid runner command so not to send anything to hc - will still get email on error once setup
-#THINK: perhaps move this to shell script to also just pass the script rtnval to hc?
+# THINK: perhaps move this to shell script to also just pass the script rtnval to hc?
 snapraid_runner_command: 'python3 {{ snapraid_runner_bin }} -c {{ snapraid_runner_conf }} > /dev/null {% if snapraid_runner_healthcheck_io_uuid %} && curl -fsS -m 10 --retry 5 -o /dev/null {{ snapraid_healthcheck_io_host }}/{{ snapraid_runner_healthcheck_io_uuid }} > /dev/null {% endif %}'
 # # snapraid_runner_command basically this:
 # # with url = the hchost/uuid
@@ -154,11 +154,12 @@ filesharing_samba_users:
 # zsh-syntax-highlighting needs to be last! (must be last to hook into cmd line)
 zsh_user_configs:
   - username: '{{ main_username }}'
+    group: '{{ main_groupname }}'
     antigen_bundles:
       - git
       - zsh-users/zsh-syntax-highlighting
 
-#TODO: figure out what to move to the higher level all.yaml
+# TODO: figure out what to move to the higher level all.yaml
 
 # ironicbadger.docker_compose_generator
 appdata_path: /mnt/storage/appdata

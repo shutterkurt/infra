@@ -6,17 +6,18 @@
     name: "{{ 'incl_vars_' ~ item|basename|splitext|first }}"
   with_fileglob:
     # get all stack compose info files
-    - '{{services_stacks_dir}}'
+    - '{{ services_stacks_dir }}'
 
 - name: Create array of containers
-  set_fact:
+  ansible.builtin.set_fact:
     # set a new variable defaulting to [] and insert/merge ('+') items created in prev step
-    services_stack_definitions: "{{ services_stack_definitions|default([]) + [lookup('vars', item)] }}"
+    services_stack_definitions: "{{ services_stack_definitions | default([]) + [lookup('vars', item)] }}"
   loop: "{{ query('varnames', '^incl_vars_(.*)$') }}"
 
-- name: print debug
+- name: Some debug
   ansible.builtin.debug:
     var: item
+    verbosity: 1
   with_items: '{{ services_stack_definitions }}'
   loop_control:
     label: '{{ item.filename }}'

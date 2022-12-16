@@ -19,6 +19,15 @@ drive-mummy:
 dump-mummy:
 	ansible-playbook -b dump.yaml --limit mummy --ask-become-pass 
 
+ha:
+	ansible-playbook -b run.yaml --skip-tags drivesetup --limit homeassistant --ask-become-pass 
+hac:
+	ansible-playbook -b run.yaml --limit homeassistant --tags compose --ask-become-pass 
+drive-ha:
+	ansible-playbook -b run.yaml --limit homeassistant --tags drivesetup -v --ask-become-pass 
+dump-ha:
+	ansible-playbook -b dump.yaml --limit homeassistant --ask-become-pass 
+
 gypsy:
 	ansible-playbook -b run.yaml --skip-tags drivesetup --limit gypsy --ask-become-pass 
 dump-gypsy:

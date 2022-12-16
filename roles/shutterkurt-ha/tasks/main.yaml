@@ -1,0 +1,33 @@
+- name: Ensure extra disks are mounted
+  ansible.builtin.include_role:
+    name: shutterkurt-ha-drives
+
+- name: Ensure appdata directories exist
+  ansible.builtin.file:
+    dest: '{{ item.path }}'
+    state: directory
+    owner: '{{ item.owner }}'
+    group: '{{ item.group }}'
+    mode: '{{ item.mode }}'
+  loop:
+    - path: '{{ appdata_path }}/portainer'
+      owner: '{{ main_username }}'
+      group: '{{ main_groupname }}'
+      mode: '0775'
+    - path: '{{ appdata_path }}/homeassistant'
+      owner: '{{ main_username }}'
+      group: '{{ main_groupname }}'
+      mode: '0775'
+    - path: '{{ appdata_path }}/homeassistant/config'
+      owner: '{{ main_username }}'
+      group: '{{ main_groupname }}'
+      mode: '0775'
+
+- name: Generate compose file
+  ansible.builtin.include_role:
+    name: shutterkurt-services
+    apply:
+      tags:
+        - compose # add compose to all shutterkurt-services tasks
+  tags:
+    - compose # add compose to the include_role task itself

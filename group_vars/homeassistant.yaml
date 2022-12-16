@@ -1,0 +1,39 @@
+---
+myhostname: homeassistant
+
+docker_install_compose: true
+docker_compose_version: 'v2.11.1'
+
+# shutterkurt-services
+services_stacks_dir: 'compose/ha-stack*.yaml'
+
+appdata_path: /opt/appdata
+docker_compose_generator_output_path: '{{ appdata_path }}'
+
+# grog.package - extra packages for this group/server
+package_list_group:
+  - name: build-essential
+  - name: iftop
+  - name: iotop
+  - name: lm-sensors
+  - name: smartmontools
+
+# geerlingguy-pip
+pip_install_packages:
+  - name: docker
+
+# extra drives to setup besides the OS drive
+ha_drives:
+  - uuid: 1c10b0d9-3034-4e95-aaba-aca6d8c59da2
+    path: '{{ appdata_path }}'
+    mkfs_type: ext4
+
+# shutterkurt-zsh
+# assumes install of oh-my-zsh and powerlevel10K prompt
+# zsh-syntax-highlighting needs to be last! (must be last to hook into cmd line)
+zsh_user_configs:
+  - username: '{{ main_username }}'
+    group: '{{ main_groupname }}'
+    antigen_bundles:
+      - git
+      - zsh-users/zsh-syntax-highlighting

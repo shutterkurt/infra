@@ -1,0 +1,18 @@
+- name: 'Query the mount point dir {{ dir_path }}'
+  ansible.builtin.stat:
+    path: '{{ dir_path }}'
+  register: mount_stats
+
+- name: Create missing mount point directory
+  ansible.builtin.file:
+    dest: '{{ dir_path }}'
+    state: directory
+    mode: 0775
+  when: not mount_stats.stat.exists
+
+- name: Assert that mount point is a directory
+  ansible.builtin.assert:
+    that:
+      - mount_stats.stat.isdir
+    fail_msg: 'mount point ({{ dir_path }}) must be a directory!'
+  when: mount_stats.stat.exists
